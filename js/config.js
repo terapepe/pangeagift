@@ -15,8 +15,8 @@ window.PANGEA_CONFIG = {
   // Contract addresses. Leave "" until published — the site shows "Coming soon".
   // Base, Robinhood Chain and BNB Chain share the same EVM address.
   contracts: {
-    evm: "",
-    solana: "",
+    evm: "0x5011Ed8BEDE185b2433629dF171B56A48124B6EA",
+    solana: "8Eo5kyxkb2wk1sxxeGJQyTGugWbAL9TrbetwhSPo46ea",
   },
 
   // Networks used to read balances. Replace RPCs with your own (Alchemy/QuickNode…) for production.
