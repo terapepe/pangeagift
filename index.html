@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pangea Gift ($GIFT) — Hold. Rank. Unwrap.</title>
+  <meta name="description" content="Pangea Gift ($GIFT) rewards the Top 5 holders every day with real gift cards. One community across Base, Robinhood Chain, BNB Chain and Solana." />
+  <meta property="og:title" content="Pangea Gift ($GIFT)" />
+  <meta property="og:description" content="Top 5 holders win a gift card every day. Countdown resets at midnight New York time." />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#top"><img src="assets/logo.svg" alt="" width="34" height="34" /><span>Pangea<b>Gift</b></span></a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#rewards">Rewards</a>
+      <a href="#leaderboard">Top 5</a>
+      <a href="#chains">Chains</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <button class="btn btn-primary" data-action="connect" id="navConnect">Connect Wallet</button>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="pill">One supercontinent. Four chains. Daily gifts.</span>
+        <h1>Hold <span class="grad">$GIFT</span>.<br />Climb the Top 5.<br />Unwrap a gift card.</h1>
+        <p class="lead">Pangea Gift turns holding into a daily game. Every night at midnight New York time we snapshot the leaderboard, and the five biggest holders each receive a real gift card code. No staking, no forms, no lottery — just hold.</p>
+        <div class="hero-cta">
+          <button class="btn btn-primary btn-lg" data-action="connect">Check my $GIFT</button>
+          <a class="btn btn-ghost btn-lg" id="xLinkHero" target="_blank" rel="noopener">Follow on X</a>
+        </div>
+      </div>
+
+      <div class="countdown-card">
+        <div class="cd-label">Next snapshot in</div>
+        <div class="cd" id="countdown">
+          <div><span id="cdH">--</span><small>hours</small></div>
+          <div><span id="cdM">--</span><small>min</small></div>
+          <div><span id="cdS">--</span><small>sec</small></div>
+        </div>
+        <div class="cd-sub">00:00 New York time · <span id="nyNow">--</span> ET now</div>
+        <div class="today-gift">
+          <div class="gift-box" aria-hidden="true"><div class="lid"></div><div class="ribbon"></div></div>
+          <div>
+            <div class="tg-label">Today's reward</div>
+            <div class="tg-name" id="todayGift">—</div>
+            <div class="tg-meta"><span id="winnersCount">5</span> winners · gift card code</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS STRIP -->
+    <section class="strip">
+      <div><b id="statWinners">5</b><span>winners every day</span></div>
+      <div><b id="statBrands">19</b><span>gift card brands</span></div>
+      <div><b>4</b><span>supported chains</span></div>
+      <div><b>00:00</b><span>ET daily snapshot</span></div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how">
+      <h2>How it works</h2>
+      <p class="section-lead">Three steps. Zero paperwork.</p>
+      <div class="steps">
+        <article class="step">
+          <div class="step-n">01</div>
+          <h3>Get $GIFT</h3>
+          <p>Pick up $GIFT on Base, Robinhood Chain, BNB Chain or Solana. Use whichever chain you already live on — every chain counts.</p>
+        </article>
+        <article class="step">
+          <div class="step-n">02</div>
+          <h3>Hold through midnight</h3>
+          <p>At exactly 00:00 New York time we take a snapshot of every wallet. The five largest holders at that moment are the day's winners.</p>
+        </article>
+        <article class="step">
+          <div class="step-n">03</div>
+          <h3>Unwrap your gift</h3>
+          <p>Winners connect the winning wallet, sign a free message to prove ownership, and reveal their gift card code. Redeem it in minutes.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- CHECK HOLDINGS -->
+    <section class="section" id="check">
+      <div class="check-card">
+        <div>
+          <h2>Your $GIFT</h2>
+          <p class="section-lead" id="walletStatus">Connect a wallet to read your balance directly from the blockchain.</p>
+          <div class="wallet-buttons" id="walletButtons">
+            <button class="btn btn-primary" data-action="connect-evm">EVM wallet <small>Base · Robinhood · BNB</small></button>
+            <button class="btn btn-ghost" data-action="connect-sol">Solana wallet <small>Phantom · Solflare</small></button>
+          </div>
+          <div class="wallet-connected hidden" id="walletConnected">
+            <code id="walletAddr"></code>
+            <button class="btn btn-ghost btn-sm" data-action="refresh">Refresh</button>
+            <button class="btn btn-ghost btn-sm" data-action="disconnect">Disconnect</button>
+          </div>
+        </div>
+        <div class="balances" id="balances">
+          <div class="bal-total"><span>Total held</span><b id="balTotal">—</b></div>
+          <ul id="balList"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- REWARDS -->
+    <section class="section" id="rewards">
+      <h2>The gift vault</h2>
+      <p class="section-lead">Rewards rotate across 19 of the world's most-wanted gift cards — gaming, shopping, food, streaming and more. Today's brand is highlighted.</p>
+      <div class="brands" id="brands"></div>
+      <p class="fine">Brand names belong to their respective owners. Pangea Gift is not affiliated with, sponsored or endorsed by any of these brands; gift cards are purchased through authorized retail channels.</p>
+    </section>
+
+    <!-- LEADERBOARD -->
+    <section class="section" id="leaderboard">
+      <h2>Today's Top 5</h2>
+      <p class="section-lead">Live ranking of the largest $GIFT holders across all chains. Final positions lock at 00:00 ET.</p>
+      <div class="board" id="board">
+        <div class="board-empty" id="boardEmpty">
+          <div class="gift-box small" aria-hidden="true"><div class="lid"></div><div class="ribbon"></div></div>
+          <p><b>Leaderboard opens at launch.</b><br />The live ranking appears here as soon as the $GIFT contract is published and the first snapshot runs.</p>
+        </div>
+        <ol class="board-list hidden" id="boardList"></ol>
+        <div class="board-foot hidden" id="boardFoot"></div>
+      </div>
+    </section>
+
+    <!-- CHAINS -->
+    <section class="section" id="chains">
+      <h2>One token, four lands</h2>
+      <p class="section-lead">Pangea was the supercontinent that held every land together. $GIFT does the same for chains — one community, one leaderboard.</p>
+      <div class="chains" id="chainCards"></div>
+    </section>
+
+    <!-- RULES -->
+    <section class="section">
+      <h2>Fair play rules</h2>
+      <div class="rules">
+        <div><h4>Snapshot, not average</h4><p>Rankings use the balance held at 00:00:00 ET. What you hold at midnight is what counts.</p></div>
+        <div><h4>One prize per wallet per day</h4><p>Each winning wallet receives one gift card code per daily round.</p></div>
+        <div><h4>Excluded wallets</h4><p>Liquidity pools, bridges, exchange wallets, the team wallet and burn addresses are never ranked.</p></div>
+        <div><h4>Claim window</h4><p>Winners have 7 days to reveal their code with the winning wallet. Unclaimed codes roll into future rounds.</p></div>
+        <div><h4>Anti-gaming</h4><p>Wallets splitting or cycling balances to manipulate rankings may be disqualified.</p></div>
+        <div><h4>Proof, not trust</h4><p>Balances are read directly from public blockchains. Anyone can verify every winner on the explorers.</p></div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <h2>FAQ</h2>
+      <div class="faq">
+        <details><summary>Do I need to stake or register?</summary><p>No. Just hold $GIFT in a self-custody wallet. The snapshot finds you automatically.</p></details>
+        <details><summary>Which chain is best?</summary><p>All four count equally. Base, Robinhood Chain and BNB Chain share the same contract address; Solana has its own mint address.</p></details>
+        <details><summary>When exactly is the snapshot?</summary><p>Every day at 00:00 New York time (ET), including weekends. The countdown on this page always shows the time left.</p></details>
+        <details><summary>How do I receive my gift card?</summary><p>Connect the winning wallet on this site and sign a free message (no gas, no transaction). Your code is revealed only to you.</p></details>
+        <details><summary>Can I choose the brand?</summary><p>Each day features one brand from the vault. Follow <a id="xLinkFaq" target="_blank" rel="noopener">our X</a> to see upcoming brands.</p></details>
+        <details><summary>Will anyone ever DM me for my seed phrase?</summary><p>Never. Pangea Gift will never ask for your seed phrase, private key or a token approval to claim a prize. Signing a plain message is all it takes.</p></details>
+      </div>
+    </section>
+
+    <section class="cta">
+      <h2>Midnight is coming.</h2>
+      <p>Make sure your wallet is on the board when the clock hits 00:00 ET.</p>
+      <div class="hero-cta center">
+        <button class="btn btn-primary btn-lg" data-action="connect">Connect Wallet</button>
+        <a class="btn btn-ghost btn-lg" id="xLinkCta" target="_blank" rel="noopener">@PangeaGift</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="brand"><img src="assets/logo.svg" alt="" width="28" height="28" /><span>Pangea<b>Gift</b></span></div>
+    <p>$GIFT is a community token with no intrinsic value or expectation of financial return. Rewards are promotional and may change. Not financial advice. Always DYOR.</p>
+    <p>© <span id="year"></span> Pangea Gift · <a id="xLinkFoot" target="_blank" rel="noopener">X</a></p>
+  </footer>
+
+  <!-- Wallet picker -->
+  <div class="modal hidden" id="walletModal">
+    <div class="modal-card">
+      <div class="modal-head"><h3>Connect a wallet</h3><button class="x" data-action="close-modal" aria-label="Close">×</button></div>
+      <div id="walletOptions"></div>
+      <p class="fine">Read-only: connecting only shares your public address. No approvals, no transactions.</p>
+    </div>
+  </div>
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
