@@ -15,7 +15,7 @@ window.PANGEA_CONFIG = {
   // Contract addresses. Leave "" until published — the site shows "Coming soon".
   // Base, Robinhood Chain and BNB Chain share the same EVM address.
   contracts: {
-    evm: "",
+    evm: "0x",
     solana: "",
   },
 
