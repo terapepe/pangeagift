@@ -14,7 +14,7 @@ window.PANGEA_CONFIG = {
 
   // Contract address on Robinhood Chain. Leave "" until published — the site shows "Coming soon".
   contracts: {
-    evm: "0x167b40dab3f334d0445e07f4ec00cef89e50a7c0",
+    evm: "",
   },
 
   // Network used to read balances. Replace RPC with your own for production.
