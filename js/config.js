@@ -12,19 +12,14 @@ window.PANGEA_CONFIG = {
     x: "PangeaGift", // X handle without "@"
   },
 
-  // Contract addresses. Leave "" until published — the site shows "Coming soon".
-  // Base, Robinhood Chain and BNB Chain share the same EVM address.
+  // Contract address on Robinhood Chain. Leave "" until published — the site shows "Coming soon".
   contracts: {
     evm: "0x167b40dab3f334d0445e07f4ec00cef89e50a7c0",
-    solana: "8Eo5kyxkb2wk1sxxeGJQyTGugWbAL9TrbetwhSPo46ea",
   },
 
-  // Networks used to read balances. Replace RPCs with your own (Alchemy/QuickNode…) for production.
+  // Network used to read balances. Replace RPC with your own for production.
   chains: {
-    base:      { label: "Base",            chainId: 8453, rpc: "https://mainnet.base.org",                 explorer: "https://basescan.org/token/" },
-    robinhood: { label: "Robinhood Chain", chainId: 4663, rpc: "https://rpc.mainnet.chain.robinhood.com",  explorer: "https://robinhoodchain.blockscout.com/token/" },
-    bsc:       { label: "BNB Chain",       chainId: 56,   rpc: "https://bsc-dataseed.bnbchain.org",         explorer: "https://bscscan.com/token/" },
-    solana:    { label: "Solana",                         rpc: "https://api.mainnet-beta.solana.com",       explorer: "https://solscan.io/token/" },
+    robinhood: { label: "Robinhood Chain", chainId: 4663, rpc: "https://rpc.mainnet.chain.robinhood.com", explorer: "https://robinhoodchain.blockscout.com/token/" },
   },
 
   rewards: {
@@ -40,6 +35,6 @@ window.PANGEA_CONFIG = {
   },
 
   // JSON endpoint for the daily Top 5 (added later with the backend). Leave "" until ready.
-  // Expected shape: { "updatedAt": "ISO date", "holders": [{ "address": "0x…", "chain": "base", "balance": "123.45" }] }
+  // Expected shape: { "updatedAt": "ISO date", "holders": [{ "address": "0x…", "chain": "robinhood", "balance": "123.45" }] }
   leaderboardUrl: "",
 };

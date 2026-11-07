@@ -1,7 +1,7 @@
 (() => {
   const C = window.PANGEA_CONFIG;
   const $ = (id) => document.getElementById(id);
-  const EVM_CHAINS = ["base", "robinhood", "bsc"];
+  const EVM_CHAINS = ["robinhood"];
   const state = { kind: null, address: null, provider: null, evmProviders: [] };
 
   // ---------- helpers ----------
@@ -25,6 +25,15 @@
     $("winnersCount").textContent = $("statWinners").textContent = C.rewards.winnersPerDay;
     $("statBrands").textContent = C.rewards.brands.length;
 
+    const heroCa = $("heroCa");
+    if (C.contracts.evm) {
+      heroCa.dataset.copy = C.contracts.evm;
+      $("heroCaAddr").textContent = C.contracts.evm;
+    } else {
+      $("heroCaAddr").textContent = "Contract coming soon";
+      heroCa.querySelector(".hero-ca-btn").classList.add("hidden");
+    }
+
     $("brands").innerHTML = C.rewards.brands
       .map((b) => {
         const on = b === C.rewards.current;
@@ -34,14 +43,14 @@
 
     const chainCard = (key) => {
       const ch = C.chains[key];
-      const ca = key === "solana" ? C.contracts.solana : C.contracts.evm;
+      const ca = C.contracts.evm;
       const body = ca
         ? `<code class="ca" data-copy="${ca}" title="Click to copy">${short(ca)}</code>
            <a class="link" href="${ch.explorer}${ca}" target="_blank" rel="noopener">Explorer ↗</a>`
         : `<span class="soon">Contract coming soon</span>`;
       return `<div class="chain chain-${key}"><h4>${ch.label}</h4>${body}</div>`;
     };
-    $("chainCards").innerHTML = ["base", "robinhood", "bsc", "solana"].map(chainCard).join("");
+    $("chainCards").innerHTML = EVM_CHAINS.map(chainCard).join("");
   }
 
   // ---------- countdown to next 00:00 in New York ----------
@@ -102,17 +111,10 @@
     return Number(BigInt(raw)) / 10 ** Number(BigInt(dec));
   }
 
-  async function solBalance(owner) {
-    const res = await rpc(C.chains.solana.rpc, "getTokenAccountsByOwner", [
-      owner, { mint: C.contracts.solana }, { encoding: "jsonParsed" },
-    ]);
-    return res.value.reduce((sum, a) => sum + (a.account.data.parsed.info.tokenAmount.uiAmount || 0), 0);
-  }
-
   async function loadBalances() {
     const list = $("balList");
-    const keys = state.kind === "evm" ? EVM_CHAINS : ["solana"];
-    const ca = state.kind === "evm" ? C.contracts.evm : C.contracts.solana;
+    const keys = EVM_CHAINS;
+    const ca = C.contracts.evm;
 
     if (!ca) {
       $("balTotal").textContent = "—";
@@ -127,7 +129,7 @@
       keys.map(async (k) => {
         const el = $("bal-" + k).querySelector("b");
         try {
-          const v = k === "solana" ? await solBalance(state.address) : await evmBalance(k, state.address);
+          const v = await evmBalance(k, state.address);
           total += v; ok++;
           el.textContent = fmt(v);
         } catch (e) {
@@ -173,26 +175,17 @@
   });
   window.dispatchEvent(new Event("eip6963:requestProvider"));
 
-  const solProviders = () => {
-    const out = [];
-    if (window.phantom?.solana?.isPhantom) out.push({ name: "Phantom", p: window.phantom.solana });
-    if (window.solflare?.isSolflare) out.push({ name: "Solflare", p: window.solflare });
-    if (!out.length && window.solana) out.push({ name: "Solana wallet", p: window.solana });
-    return out;
-  };
-
-  function openModal(filter) {
+  function openModal() {
     const evm = state.evmProviders.length
       ? state.evmProviders.map((d, i) => ({ label: d.info.name, icon: d.info.icon, tag: "EVM", go: () => connectEvm(d.provider), i }))
       : window.ethereum ? [{ label: "Browser wallet", tag: "EVM", go: () => connectEvm(window.ethereum) }] : [];
-    const sol = solProviders().map((s) => ({ label: s.name, tag: "Solana", go: () => connectSol(s.p) }));
-    let opts = filter === "evm" ? evm : filter === "sol" ? sol : [...evm, ...sol];
+    const opts = evm;
 
     const box = $("walletOptions");
     if (!opts.length) {
       box.innerHTML = `<p class="muted">No wallet detected. Install <a href="https://metamask.io" target="_blank" rel="noopener">MetaMask</a>,
         <a href="https://www.coinbase.com/wallet" target="_blank" rel="noopener">Coinbase Wallet</a> or
-        <a href="https://phantom.com" target="_blank" rel="noopener">Phantom</a>, then reload this page.
+        <a href="https://rabby.io" target="_blank" rel="noopener">Rabby</a>, then reload this page.
         On mobile, open this site inside your wallet's built-in browser.</p>`;
     } else {
       box.innerHTML = opts
@@ -215,23 +208,12 @@
     }
   }
 
-  async function connectSol(provider) {
-    try {
-      const res = await provider.connect();
-      setWallet("sol", (res?.publicKey || provider.publicKey).toString(), provider);
-    } catch (e) {
-      toast(e.message || "Connection rejected");
-    }
-  }
-
   function setWallet(kind, address, provider) {
-    Object.assign(state, { kind: kind === "evm" ? "evm" : "sol", address, provider });
+    Object.assign(state, { kind, address, provider });
     $("walletButtons").classList.add("hidden");
     $("walletConnected").classList.remove("hidden");
     $("walletAddr").textContent = address;
-    $("walletStatus").textContent = kind === "evm"
-      ? "Reading your balance on Base, Robinhood Chain and BNB Chain."
-      : "Reading your balance on Solana.";
+    $("walletStatus").textContent = "Reading your balance on Robinhood Chain.";
     document.querySelectorAll('[data-action="connect"]').forEach((b) => (b.textContent = short(address)));
     loadBalances();
     loadLeaderboard();
@@ -239,7 +221,6 @@
   }
 
   function disconnect() {
-    try { state.kind === "sol" && state.provider?.disconnect?.(); } catch {}
     Object.assign(state, { kind: null, address: null, provider: null });
     $("walletButtons").classList.remove("hidden");
     $("walletConnected").classList.add("hidden");
@@ -254,14 +235,17 @@
   document.addEventListener("click", (e) => {
     const a = e.target.closest("[data-action]")?.dataset.action;
     if (a === "connect") state.address ? document.getElementById("check").scrollIntoView({ behavior: "smooth" }) : openModal();
-    else if (a === "connect-evm") openModal("evm");
-    else if (a === "connect-sol") openModal("sol");
+    else if (a === "connect-evm") openModal();
     else if (a === "close-modal") closeModal();
     else if (a === "refresh") loadBalances();
     else if (a === "disconnect") disconnect();
 
     const copy = e.target.closest("[data-copy]");
-    if (copy) navigator.clipboard.writeText(copy.dataset.copy).then(() => toast("Address copied"));
+    if (copy) navigator.clipboard.writeText(copy.dataset.copy).then(() => {
+      toast("Contract address copied");
+      const btn = copy.querySelector(".hero-ca-btn");
+      if (btn) { btn.textContent = "Copied ✓"; setTimeout(() => (btn.textContent = "Copy"), 1800); }
+    });
   });
   $("walletModal").addEventListener("click", (e) => e.target.id === "walletModal" && closeModal());
 
