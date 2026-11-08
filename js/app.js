@@ -1,8 +1,34 @@
 (() => {
   const C = window.PANGEA_CONFIG;
   const $ = (id) => document.getElementById(id);
-  const EVM_CHAINS = ["robinhood"];
+  // ---------- single / multi chain mode ----------
+  const SINGLE = C.mode === "single" && C.chains[C.singleChain];
+  const ACTIVE = SINGLE ? [C.singleChain] : Object.keys(C.chains);
+  const isSol = (k) => C.chains[k].type === "solana";
+  const EVM_CHAINS = ACTIVE.filter((k) => !isSol(k));
+  const SOL_CHAINS = ACTIVE.filter(isSol);
+  // contracts.evm = Robinhood CA, contracts.sol = Solana mint; other chains use their own `ca`
+  const caOf = (k) => (C.chains[k].ca || (isSol(k) ? C.contracts.sol : k === "robinhood" ? C.contracts.evm : "") || "").trim();
+  const names = (keys) => keys.map((k) => C.chains[k].label).join(", ").replace(/, ([^,]*)$/, " and $1");
+  const MAIN = ACTIVE[0];
+  const SOL_WALLETS = [
+    { name: "Phantom", get: () => window.phantom?.solana?.isPhantom ? window.phantom.solana : (window.solana?.isPhantom ? window.solana : null) },
+    { name: "Solflare", get: () => window.solflare?.isSolflare ? window.solflare : null },
+    { name: "Backpack", get: () => window.backpack?.solana || null },
+  ];
   const state = { kind: null, address: null, provider: null, evmProviders: [] };
+
+  // Multi mode: swap texts that mention a single chain (data-multi / data-multi-html, {chains} = list)
+  function applyMode() {
+    document.body.dataset.mode = SINGLE ? "single" : "multi";
+    const lbl = document.getElementById("evmChainsLabel");
+    if (lbl) lbl.textContent = names(EVM_CHAINS);
+    if (SINGLE) return;
+    const fill = (t) => t.replaceAll("{chains}", names(ACTIVE)).replaceAll("{n}", ACTIVE.length);
+    document.querySelectorAll("[data-multi]").forEach((el) => (el.textContent = fill(el.dataset.multi)));
+    document.querySelectorAll("[data-multi-html]").forEach((el) => (el.innerHTML = fill(el.dataset.multiHtml)));
+    document.querySelectorAll(".multi-only").forEach((el) => el.classList.remove("hidden"));
+  }
 
   // ---------- helpers ----------
   const short = (a) => (a ? a.slice(0, 6) + "…" + a.slice(-4) : "");
@@ -25,10 +51,11 @@
     $("winnersCount").textContent = $("statWinners").textContent = C.rewards.winnersPerDay;
     $("statBrands").textContent = C.rewards.brands.length;
 
-    const heroCa = $("heroCa");
-    if (C.contracts.evm) {
-      heroCa.dataset.copy = C.contracts.evm;
-      $("heroCaAddr").textContent = C.contracts.evm;
+    const heroCa = $("heroCa"), mainCa = caOf(MAIN);
+    heroCa.querySelector(".hero-ca-label").textContent = "CA · " + C.chains[MAIN].label;
+    if (mainCa) {
+      heroCa.dataset.copy = mainCa;
+      $("heroCaAddr").textContent = mainCa;
     } else {
       $("heroCaAddr").textContent = "Contract coming soon";
       heroCa.querySelector(".hero-ca-btn").classList.add("hidden");
@@ -43,14 +70,14 @@
 
     const chainCard = (key) => {
       const ch = C.chains[key];
-      const ca = C.contracts.evm;
+      const ca = caOf(key);
       const body = ca
         ? `<code class="ca" data-copy="${ca}" title="Click to copy">${short(ca)}</code>
            <a class="link" href="${ch.explorer}${ca}" target="_blank" rel="noopener">Explorer ↗</a>`
         : `<span class="soon">Contract coming soon</span>`;
       return `<div class="chain chain-${key}"><h4>${ch.label}</h4>${body}</div>`;
     };
-    $("chainCards").innerHTML = EVM_CHAINS.map(chainCard).join("");
+    $("chainCards").innerHTML = ACTIVE.map(chainCard).join("");
   }
 
   // ---------- countdown to next 00:00 in New York ----------
@@ -99,9 +126,14 @@
     return j.result;
   }
 
+  async function solBalance(chainKey, owner) {
+    const r = await rpc(C.chains[chainKey].rpc, "getTokenAccountsByOwner", [owner, { mint: caOf(chainKey) }, { encoding: "jsonParsed" }]);
+    return (r?.value || []).reduce((s, a) => s + (a.account.data.parsed.info.tokenAmount.uiAmount || 0), 0);
+  }
+
   async function evmBalance(chainKey, holder) {
     const { rpc: url } = C.chains[chainKey];
-    const ca = C.contracts.evm;
+    const ca = caOf(chainKey);
     const data = "0x70a08231" + holder.toLowerCase().replace("0x", "").padStart(64, "0"); // balanceOf(address)
     const [raw, dec] = await Promise.all([
       rpc(url, "eth_call", [{ to: ca, data }, "latest"]),
@@ -113,10 +145,9 @@
 
   async function loadBalances() {
     const list = $("balList");
-    const keys = EVM_CHAINS;
-    const ca = C.contracts.evm;
+    const keys = (state.kind === "sol" ? SOL_CHAINS : EVM_CHAINS).filter((k) => caOf(k));
 
-    if (!ca) {
+    if (!keys.length) {
       $("balTotal").textContent = "—";
       list.innerHTML = `<li class="muted">The ${C.token.symbol} contract isn't published yet. Your balance will appear here at launch.</li>`;
       return;
@@ -129,7 +160,7 @@
       keys.map(async (k) => {
         const el = $("bal-" + k).querySelector("b");
         try {
-          const v = await evmBalance(k, state.address);
+          const v = await (isSol(k) ? solBalance(k, state.address) : evmBalance(k, state.address));
           total += v; ok++;
           el.textContent = fmt(v);
         } catch (e) {
@@ -153,6 +184,7 @@
       $("boardList").innerHTML = data.holders
         .slice(0, C.rewards.winnersPerDay)
         .map((h, i) => {
+          if (!ACTIVE.includes(h.chain)) return "";
           const me = state.address && h.address.toLowerCase() === state.address.toLowerCase();
           const ch = C.chains[h.chain];
           return `<li class="${me ? "me" : ""}"><span class="rank">#${i + 1}</span>
@@ -179,7 +211,10 @@
     const evm = state.evmProviders.length
       ? state.evmProviders.map((d, i) => ({ label: d.info.name, icon: d.info.icon, tag: "EVM", go: () => connectEvm(d.provider), i }))
       : window.ethereum ? [{ label: "Browser wallet", tag: "EVM", go: () => connectEvm(window.ethereum) }] : [];
-    const opts = evm;
+    const sol = SOL_CHAINS.length
+      ? SOL_WALLETS.filter((w) => w.get()).map((w) => ({ label: w.name, icon: w.get().icon, tag: "Solana", go: () => connectSol(w.get()) }))
+      : [];
+    const opts = [...(EVM_CHAINS.length ? evm : []), ...sol];
 
     const box = $("walletOptions");
     if (!opts.length) {
@@ -208,12 +243,22 @@
     }
   }
 
+  async function connectSol(provider) {
+    try {
+      const r = await provider.connect();
+      setWallet("sol", ((r && r.publicKey) || provider.publicKey).toString(), provider);
+      provider.on?.("accountChanged", (pk) => (pk ? setWallet("sol", pk.toString(), provider) : disconnect()));
+    } catch (e) {
+      toast(e.message || "Connection rejected");
+    }
+  }
+
   function setWallet(kind, address, provider) {
     Object.assign(state, { kind, address, provider });
     $("walletButtons").classList.add("hidden");
     $("walletConnected").classList.remove("hidden");
     $("walletAddr").textContent = address;
-    $("walletStatus").textContent = "Reading your balance on Robinhood Chain.";
+    $("walletStatus").textContent = "Reading your balance on " + names(kind === "sol" ? SOL_CHAINS : EVM_CHAINS) + ".";
     document.querySelectorAll('[data-action="connect"]').forEach((b) => (b.textContent = short(address)));
     loadBalances();
     loadLeaderboard();
@@ -235,7 +280,7 @@
   document.addEventListener("click", (e) => {
     const a = e.target.closest("[data-action]")?.dataset.action;
     if (a === "connect") state.address ? document.getElementById("check").scrollIntoView({ behavior: "smooth" }) : openModal();
-    else if (a === "connect-evm") openModal();
+    else if (a === "connect-evm" || a === "connect-sol") openModal();
     else if (a === "close-modal") closeModal();
     else if (a === "refresh") loadBalances();
     else if (a === "disconnect") disconnect();
@@ -249,6 +294,7 @@
   });
   $("walletModal").addEventListener("click", (e) => e.target.id === "walletModal" && closeModal());
 
+  applyMode();
   renderStatic();
   tick();
   setInterval(tick, 1000);

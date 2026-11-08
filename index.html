@@ -31,7 +31,7 @@
     <!-- HERO -->
     <section class="hero">
       <div class="hero-copy">
-        <span class="pill">Built on Robinhood Chain. Daily gifts.</span>
+        <span class="pill" data-multi="Live on {chains}. Daily gifts.">Built on Robinhood Chain. Daily gifts.</span>
         <h1>Hold <span class="grad">$GIFT</span>.<br />Climb the Top 5.<br />Unwrap a gift card.</h1>
         <p class="lead">Pangea Gift turns holding into a daily game. Every night at midnight New York time we snapshot the leaderboard, and the five biggest holders each receive a real gift card code. No staking, no forms, no lottery — just hold.</p>
         <div class="hero-ca" id="heroCa" title="Click to copy">
@@ -68,7 +68,7 @@
     <section class="strip">
       <div><b id="statWinners">5</b><span>winners every day</span></div>
       <div><b id="statBrands">19</b><span>gift card brands</span></div>
-      <div><b>Robinhood</b><span>Chain</span></div>
+      <div data-multi-html="<b>{n}</b><span>Chains</span>"><b>Robinhood</b><span>Chain</span></div>
       <div><b>00:00</b><span>ET daily snapshot</span></div>
     </section>
 
@@ -80,7 +80,7 @@
         <article class="step">
           <div class="step-n">01</div>
           <h3>Get $GIFT</h3>
-          <p>Pick up $GIFT on Robinhood Chain and keep it in a self-custody EVM wallet.</p>
+          <p data-multi="Pick up $GIFT on {chains} and keep it in a self-custody wallet.">Pick up $GIFT on Robinhood Chain and keep it in a self-custody EVM wallet.</p>
         </article>
         <article class="step">
           <div class="step-n">02</div>
@@ -102,7 +102,8 @@
           <h2>Your $GIFT</h2>
           <p class="section-lead" id="walletStatus">Connect a wallet to read your balance directly from the blockchain.</p>
           <div class="wallet-buttons" id="walletButtons">
-            <button class="btn btn-primary" data-action="connect-evm">EVM wallet <small>Robinhood Chain</small></button>
+            <button class="btn btn-primary" data-action="connect-evm">EVM wallet <small id="evmChainsLabel">Robinhood Chain</small></button>
+            <button class="btn btn-primary multi-only hidden" data-action="connect-sol">Solana wallet <small>Phantom · Solflare</small></button>
           </div>
           <div class="wallet-connected hidden" id="walletConnected">
             <code id="walletAddr"></code>
@@ -128,7 +129,7 @@
     <!-- LEADERBOARD -->
     <section class="section" id="leaderboard">
       <h2>Today's Top 5</h2>
-      <p class="section-lead">Live ranking of the largest $GIFT holders on Robinhood Chain. Final positions lock at 00:00 ET.</p>
+      <p class="section-lead" data-multi="Live ranking of the largest $GIFT holders on {chains}. Final positions lock at 00:00 ET.">Live ranking of the largest $GIFT holders on Robinhood Chain. Final positions lock at 00:00 ET.</p>
       <div class="board" id="board">
         <div class="board-empty" id="boardEmpty">
           <div class="gift-box small" aria-hidden="true"><div class="lid"></div><div class="ribbon"></div></div>
@@ -141,8 +142,8 @@
 
     <!-- CHAINS -->
     <section class="section" id="chains">
-      <h2>Robinhood Chain</h2>
-      <p class="section-lead">$GIFT lives on Robinhood Chain — one contract, one community, one leaderboard.</p>
+      <h2 data-multi="{n} chains">Robinhood Chain</h2>
+      <p class="section-lead" data-multi="$GIFT lives on {chains} — one token, one community, one leaderboard.">$GIFT lives on Robinhood Chain — one contract, one community, one leaderboard.</p>
       <div class="chains" id="chainCards"></div>
     </section>
 
@@ -155,7 +156,7 @@
         <div><h4>Excluded wallets</h4><p>Liquidity pools, bridges, exchange wallets, the team wallet and burn addresses are never ranked.</p></div>
         <div><h4>Claim window</h4><p>Winners have 7 days to reveal their code with the winning wallet. Unclaimed codes roll into future rounds.</p></div>
         <div><h4>Anti-gaming</h4><p>Wallets splitting or cycling balances to manipulate rankings may be disqualified.</p></div>
-        <div><h4>Proof, not trust</h4><p>Balances are read directly from public blockchains. Anyone can verify every winner on the Robinhood Chain explorer.</p></div>
+        <div><h4>Proof, not trust</h4><p data-multi="Balances are read directly from public blockchains. Anyone can verify every winner on the chain explorers.">Balances are read directly from public blockchains. Anyone can verify every winner on the Robinhood Chain explorer.</p></div>
       </div>
     </section>
 
@@ -164,7 +165,7 @@
       <h2>FAQ</h2>
       <div class="faq">
         <details><summary>Do I need to stake or register?</summary><p>No. Just hold $GIFT in a self-custody wallet. The snapshot finds you automatically.</p></details>
-        <details><summary>Which chain is $GIFT on?</summary><p>Robinhood Chain only. Use any EVM wallet (MetaMask, Rabby, Coinbase Wallet…) to hold and check your $GIFT.</p></details>
+        <details><summary data-multi="Which chains is $GIFT on?">Which chain is $GIFT on?</summary><p data-multi="{chains}. Use an EVM wallet (MetaMask, Rabby, Coinbase Wallet…) for EVM chains and Phantom or Solflare for Solana.">Robinhood Chain only. Use any EVM wallet (MetaMask, Rabby, Coinbase Wallet…) to hold and check your $GIFT.</p></details>
         <details><summary>When exactly is the snapshot?</summary><p>Every day at 00:00 New York time (ET), including weekends. The countdown on this page always shows the time left.</p></details>
         <details><summary>How do I receive my gift card?</summary><p>Connect the winning wallet on this site and sign a free message (no gas, no transaction). Your code is revealed only to you.</p></details>
         <details><summary>Can I choose the brand?</summary><p>Each day features one brand from the vault. Follow <a id="xLinkFaq" target="_blank" rel="noopener">our X</a> to see upcoming brands.</p></details>

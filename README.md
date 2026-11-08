@@ -4,6 +4,8 @@ Static frontend on **Robinhood Chain**: Top 5 $GIFT holders win a gift card ever
 
 ## Edit settings
 All settings live in `js/config.js`:
+- `mode` — `"single"` = only `singleChain` (Robinhood) · `"multi"` = Robinhood + Solana + Base + BSC (texts, chain cards, wallets and balances adapt)
+- `chains.<id>.ca` / `contracts.sol` — $GIFT addresses on the extra chains
 - `contracts.evm` — $GIFT CA on Robinhood Chain
 - `socials.x` — X handle
 - `rewards.current` / `rewards.value` — today's gift brand and value
