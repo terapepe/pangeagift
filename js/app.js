@@ -7,8 +7,8 @@
   const isSol = (k) => C.chains[k].type === "solana";
   const EVM_CHAINS = ACTIVE.filter((k) => !isSol(k));
   const SOL_CHAINS = ACTIVE.filter(isSol);
-  // contracts.evm = Robinhood CA, contracts.sol = Solana mint; other chains use their own `ca`
-  const caOf = (k) => (C.chains[k].ca || (isSol(k) ? C.contracts.sol : k === "robinhood" ? C.contracts.evm : "") || "").trim();
+  // One CA for every EVM chain (contracts.evm), Solana uses contracts.sol
+  const caOf = (k) => ((isSol(k) ? C.contracts.sol : C.contracts.evm) || "").trim();
   const names = (keys) => keys.map((k) => C.chains[k].label).join(", ").replace(/, ([^,]*)$/, " and $1");
   const MAIN = ACTIVE[0];
   const SOL_WALLETS = [

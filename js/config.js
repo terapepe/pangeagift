@@ -16,19 +16,20 @@ window.PANGEA_CONFIG = {
     x: "PangeaGift", // X handle without "@"
   },
 
-  // Contract address on Robinhood Chain. Leave "" until published — the site shows "Coming soon".
+  // $GIFT contract addresses — edit ONLY here. Leave "" until published → "Contract coming soon".
+  //   evm = one CA shared by every EVM chain (Robinhood, Base, BSC) · sol = Solana mint
   contracts: {
     evm: "0x407f21dca54cf094cf913371e1ffd61805fe9a07",
-    sol: "", // $GIFT mint on Solana (multi mode)
+    sol: "",
   },
 
   // Network used to read balances. Replace RPC with your own for production.
-  // `ca` (optional) overrides contracts.evm / contracts.sol for one chain. Order = display order.
+  // Order = display order. CA comes from contracts.evm (EVM chains) / contracts.sol (Solana).
   chains: {
     robinhood: { label: "Robinhood Chain", chainId: 4663, rpc: "https://rpc.mainnet.chain.robinhood.com", explorer: "https://robinhoodchain.blockscout.com/token/" },
-    solana:    { label: "Solana", type: "solana", ca: "", rpc: "https://api.mainnet-beta.solana.com", explorer: "https://solscan.io/token/" },
-    base:      { label: "Base", chainId: 8453, ca: "", rpc: "https://mainnet.base.org", explorer: "https://basescan.org/token/" },
-    bsc:       { label: "BNB Smart Chain", chainId: 56, ca: "", rpc: "https://bsc-dataseed.bnbchain.org", explorer: "https://bscscan.com/token/" },
+    solana:    { label: "Solana", type: "solana", rpc: "https://api.mainnet-beta.solana.com", explorer: "https://solscan.io/token/" },
+    base:      { label: "Base", chainId: 8453, rpc: "https://mainnet.base.org", explorer: "https://basescan.org/token/" },
+    bsc:       { label: "BNB Smart Chain", chainId: 56, rpc: "https://bsc-dataseed.bnbchain.org", explorer: "https://bscscan.com/token/" },
   },
 
   rewards: {
