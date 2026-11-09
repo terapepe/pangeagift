@@ -14,8 +14,8 @@ window.PANGEA_CONFIG = {
   },
 
   contracts: {
-    evm: "",
-    sol: "",
+    evm: "0x3a0EDDC21AbFf1C735A1e2472c04eDc9ec9ba6EA",
+    sol: "HrHnPSkHzqB4czjvdd3csyvrprzWtEnqJRvtL9wTT6ea",
   },
 
   chains: {
