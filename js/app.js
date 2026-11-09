@@ -63,12 +63,18 @@
     clearTimeout(toast._t);
     toast._t = setTimeout(() => t.classList.add("hidden"), 3500);
   };
-  const xUrl = "https://x.com/" + C.socials.x;
+  // socials.x: chấp nhận handle ("PangeaGift", "@PangeaGift") hoặc link X/Twitter đầy đủ
+  const xRaw = String(C.socials.x || "").trim();
+  const xIsUrl = /^(https?:\/\/)?(www\.|mobile\.)?(x|twitter)\.com\//i.test(xRaw);
+  const xHandle = xIsUrl
+    ? (xRaw.replace(/^(https?:\/\/)?(www\.|mobile\.)?(x|twitter)\.com\//i, "").split(/[/?#]/)[0] || "")
+    : xRaw.replace(/^@/, "");
+  const xUrl = xIsUrl ? (/^https?:\/\//i.test(xRaw) ? xRaw : "https://" + xRaw) : "https://x.com/" + xHandle;
 
   // ---------- static content ----------
   function renderStatic() {
     ["xLinkHero", "xLinkFaq", "xLinkCta", "xLinkFoot"].forEach((id) => ($(id).href = xUrl));
-    $("xLinkCta").textContent = "@" + C.socials.x;
+    $("xLinkCta").textContent = "@" + xHandle;
     $("year").textContent = new Date().getFullYear();
     $("todayGift").textContent = C.rewards.current + (C.rewards.value ? " · " + C.rewards.value : "") + " Gift Card";
     $("winnersCount").textContent = $("statWinners").textContent = C.rewards.winnersPerDay;

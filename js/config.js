@@ -10,7 +10,7 @@ window.PANGEA_CONFIG = {
   },
 
   socials: {
-    x: "https://x.com/dropperdeals/status/2119840152423968781", // X handle without "@"
+    x: "https://x.com/dropperdeals/status/2119840152423968781", // X handle ("PangeaGift") hoặc link X đầy đủ (profile/post)
   },
 
   contracts: {
