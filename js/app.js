@@ -2,13 +2,25 @@
   const C = window.PANGEA_CONFIG;
   const $ = (id) => document.getElementById(id);
   // ---------- single / multi chain mode ----------
-  const SINGLE = C.mode === "single" && C.chains[C.singleChain];
-  const ACTIVE = SINGLE ? [C.singleChain] : Object.keys(C.chains);
+  const SINGLE = C.mode !== "multi";
+  const ALL = [...new Set([...(C.multiOrder || []), ...Object.keys(C.chains)])].filter((k) => C.chains[k]);
+  const ACTIVE = SINGLE ? [C.chains[C.singleChain] ? C.singleChain : ALL[0]] : ALL; // multi = always every chain
   const isSol = (k) => C.chains[k].type === "solana";
   const EVM_CHAINS = ACTIVE.filter((k) => !isSol(k));
   const SOL_CHAINS = ACTIVE.filter(isSol);
   // One CA for every EVM chain (contracts.evm), Solana uses contracts.sol
-  const caOf = (k) => ((isSol(k) ? C.contracts.sol : C.contracts.evm) || "").trim();
+  const caOf = (k) => (C.chains[k].ca || (isSol(k) ? C.contracts.sol : C.contracts.evm) || "").trim();
+  // Chains sharing the same CA → one Copy block (multi: RH/BASE/BSC + SOL)
+  const CA_GROUPS = ACTIVE.reduce((acc, k) => {
+    const ca = caOf(k), id = ca ? ca.toLowerCase() : k, g = acc.find((x) => x.id === id);
+    g ? g.keys.push(k) : acc.push({ id, ca, keys: [k] });
+    return acc;
+  }, []);
+  // dark text on light chain colors, white on dark ones
+  const ink = (hex) => {
+    const n = parseInt(hex.slice(1), 16), l = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+    return l > 0.6 ? "#1a0f2e" : "#ffffff";
+  };
   const names = (keys) => keys.map((k) => C.chains[k].label).join(", ").replace(/, ([^,]*)$/, " and $1");
   const MAIN = ACTIVE[0];
   const SOL_WALLETS = [
@@ -23,11 +35,22 @@
     document.body.dataset.mode = SINGLE ? "single" : "multi";
     const lbl = document.getElementById("evmChainsLabel");
     if (lbl) lbl.textContent = names(EVM_CHAINS);
-    if (SINGLE) return;
-    const fill = (t) => t.replaceAll("{chains}", names(ACTIVE)).replaceAll("{n}", ACTIVE.length);
-    document.querySelectorAll("[data-multi]").forEach((el) => (el.textContent = fill(el.dataset.multi)));
-    document.querySelectorAll("[data-multi-html]").forEach((el) => (el.innerHTML = fill(el.dataset.multiHtml)));
-    document.querySelectorAll(".multi-only").forEach((el) => el.classList.remove("hidden"));
+    $("btnEvm").classList.toggle("hidden", !EVM_CHAINS.length);
+    $("btnSol").classList.toggle("hidden", !SOL_CHAINS.length);
+    const ch = C.chains[MAIN], sol = isSol(MAIN);
+    const fill = (t) => t.replaceAll("{chains}", names(ACTIVE)).replaceAll("{n}", ACTIVE.length)
+      .replaceAll("{chain}", ch.label).replaceAll("{short}", ch.short || ch.label)
+      .replaceAll("{walletType}", sol ? "Solana" : "EVM")
+      .replaceAll("{walletHint}", sol ? "Phantom, Solflare or Backpack" : "any EVM wallet (MetaMask, Rabby, Coinbase Wallet…)");
+    const m = SINGLE ? "single" : "multi", mh = SINGLE ? "singleHtml" : "multiHtml";
+    document.querySelectorAll(`[data-${m}]`).forEach((el) => (el.textContent = fill(el.dataset[m])));
+    document.querySelectorAll(`[data-${m}-html]`).forEach((el) => (el.innerHTML = fill(el.dataset[mh])));
+    if (!SINGLE) return;
+    // single-chain design: accent color, dot, tagline, page title
+    document.body.style.setProperty("--accent", ch.color);
+    document.querySelector(".pill").insertAdjacentHTML("afterbegin", '<span class="dot"></span>');
+    if (ch.tagline) { $("chainTagline").textContent = ch.tagline; $("chainTagline").classList.remove("hidden"); }
+    document.querySelector('meta[name="description"]').content += " Built on " + ch.label + ".";
   }
 
   // ---------- helpers ----------
@@ -51,15 +74,17 @@
     $("winnersCount").textContent = $("statWinners").textContent = C.rewards.winnersPerDay;
     $("statBrands").textContent = C.rewards.brands.length;
 
-    const heroCa = $("heroCa"), mainCa = caOf(MAIN);
-    heroCa.querySelector(".hero-ca-label").textContent = "CA · " + C.chains[MAIN].label;
-    if (mainCa) {
-      heroCa.dataset.copy = mainCa;
-      $("heroCaAddr").textContent = mainCa;
-    } else {
-      $("heroCaAddr").textContent = "Contract coming soon";
-      heroCa.querySelector(".hero-ca-btn").classList.add("hidden");
-    }
+    $("heroCas").innerHTML = CA_GROUPS.map(({ ca, keys }) => {
+      const color = keys.length === 1 ? C.chains[keys[0]].color : "#ffcf5a";
+      const tag = keys.map((k) => C.chains[k].short || C.chains[k].label).join("/");
+      const label = keys.length === 1 ? C.chains[keys[0]].label : tag;
+      const links = ca ? keys.map((k) => `<a href="${C.chains[k].explorer}${ca}" target="_blank" rel="noopener">${keys.length > 1 ? C.chains[k].short : "Explorer"} ↗</a>`).join("") : "";
+      return `<div class="hero-ca${ca ? "" : " off"}" ${ca ? `data-copy="${ca}" title="Click to copy"` : ""} style="--ca:${color};--ca-ink:${ink(color)}">
+        <span class="hero-ca-label">CA · ${label}${links}</span>
+        <code>${ca || "Contract coming soon"}</code>
+        ${ca ? `<span class="hero-ca-btn" data-text="Copy ${tag} CA">Copy ${tag} CA</span>` : ""}
+      </div>`;
+    }).join("");
 
     $("brands").innerHTML = C.rewards.brands
       .map((b) => {
@@ -75,7 +100,7 @@
         ? `<code class="ca" data-copy="${ca}" title="Click to copy">${short(ca)}</code>
            <a class="link" href="${ch.explorer}${ca}" target="_blank" rel="noopener">Explorer ↗</a>`
         : `<span class="soon">Contract coming soon</span>`;
-      return `<div class="chain chain-${key}"><h4>${ch.label}</h4>${body}</div>`;
+      return `<div class="chain chain-${key}" style="--ca:${ch.color}"><h4>${ch.label}</h4>${body}</div>`;
     };
     $("chainCards").innerHTML = ACTIVE.map(chainCard).join("");
   }
@@ -285,11 +310,11 @@
     else if (a === "refresh") loadBalances();
     else if (a === "disconnect") disconnect();
 
-    const copy = e.target.closest("[data-copy]");
+    const copy = !e.target.closest("a") && e.target.closest("[data-copy]");
     if (copy) navigator.clipboard.writeText(copy.dataset.copy).then(() => {
       toast("Contract address copied");
       const btn = copy.querySelector(".hero-ca-btn");
-      if (btn) { btn.textContent = "Copied ✓"; setTimeout(() => (btn.textContent = "Copy"), 1800); }
+      if (btn) { btn.textContent = "Copied ✓"; setTimeout(() => (btn.textContent = btn.dataset.text), 1800); }
     });
   });
   $("walletModal").addEventListener("click", (e) => e.target.id === "walletModal" && closeModal());
