@@ -10,7 +10,7 @@ window.PANGEA_CONFIG = {
   },
 
   socials: {
-    x: "PangeaGift", // X handle without "@"
+    x: "dropperdeals/status/2119840152423968781", // X handle without "@"
   },
 
   contracts: {
