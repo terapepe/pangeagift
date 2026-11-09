@@ -36,3 +36,4 @@ window.PANGEA_CONFIG = {
       "Uber Eats", "Netflix", "Sephora", "Disney", "Chipotle", "Chick-fil-A",
     ],
   },
+};
