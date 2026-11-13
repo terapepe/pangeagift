@@ -2,201 +2,288 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pangea Gift ($GIFT) — Hold. Rank. Unwrap.</title>
-  <meta name="description" content="Pangea Gift ($GIFT) rewards the Top 5 holders every day with real gift cards." />
-  <meta property="og:title" content="Pangea Gift ($GIFT)" />
-  <meta property="og:description" content="Top 5 holders win a gift card every day. Countdown resets at midnight New York time." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Gift Dream World — Pangea Gift ($GIFT)</title>
+  <meta name="description" content="Gift Dream World by Pangea Gift ($GIFT). Float between dream islands: daily Top 5 gift cards, Staking Isle, Mystery Box Isle and Lucky Draw Isle." />
+  <meta property="og:title" content="Gift Dream World — Pangea Gift ($GIFT)" />
+  <meta property="og:description" content="A dream sky of floating islands. Top 5 holders win a gift card every day." />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="theme-color" content="#e9dcff" />
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <canvas id="dream" aria-hidden="true"></canvas>
+  <div class="veil" aria-hidden="true"></div>
+
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader-gift"><i></i><i></i></div>
+    <p>drifting into the dream…</p>
+  </div>
+
+  <!-- ============ HEADER ============ -->
   <header class="nav">
-    <a class="brand" href="#top"><img src="assets/logo.svg" alt="" width="34" height="34" /><span>Pangea<b>Gift</b></span></a>
-    <nav class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#rewards">Rewards</a>
-      <a href="#leaderboard">Top 5</a>
-      <a href="#chains">Chains</a>
-      <a href="#faq">FAQ</a>
+    <a class="brand" href="#gate"><img src="assets/logo.svg" alt="" width="34" height="34" /><span>Pangea<em>Gift</em></span></a>
+    <nav class="isles" aria-label="Islands">
+      <a href="#gate" data-nav="0"><i></i><span>Gate</span></a>
+      <a href="#midnight" data-nav="1"><i></i><span>Midnight Gift</span></a>
+      <a href="#staking" data-nav="2"><i></i><span>Staking</span></a>
+      <a href="#mystery" data-nav="3"><i></i><span>Mystery Box</span></a>
+      <a href="#lucky" data-nav="4"><i></i><span>Lucky Draw</span></a>
+      <a href="#vault" data-nav="5"><i></i><span>Vault</span></a>
     </nav>
-    <button class="btn btn-primary" data-action="connect" id="navConnect">Connect Wallet</button>
+    <button class="wallet-chip" data-action="connect" id="navConnect">
+      <span class="wc-dot"></span><span class="wc-text" id="navWalletText">Connect Wallet</span><b class="wc-bal hidden" id="navBal"></b>
+    </button>
   </header>
 
-  <main id="top">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-copy">
-        <span class="pill" data-single="Built on {chain}. Daily gifts." data-multi="Live on {chains}. Daily gifts.">Built on Robinhood Chain. Daily gifts.</span>
-        <h1>Hold <span class="grad">$GIFT</span>.<br />Climb the Top 5.<br />Unwrap a gift card.</h1>
-        <p class="lead">Pangea Gift turns holding into a daily game. Every night at midnight New York time we snapshot the leaderboard, and the five biggest holders each receive a real gift card code. No staking, no forms, no lottery — just hold.</p>
+  <main>
+    <!-- ============ 0 · GATE ============ -->
+    <section class="isle isle-hero" id="gate" data-island="0" data-side="left">
+      <div class="dream-card hero-card">
+        <span class="eyebrow" data-single="Pangea Gift · {chain}" data-multi="Pangea Gift · {n} chains">Pangea Gift</span>
+        <h1>Gift<br /><span class="shimmer">Dream</span> World</h1>
+        <p class="lead">Somewhere above the clouds, gifts float free. Hold <b>$GIFT</b>, climb the staircase into the sky, and wander from island to island — each one a different way to unwrap something.</p>
         <p class="chain-tagline hidden" id="chainTagline"></p>
+        <div class="hero-chips">
+          <span><b id="statWinners">5</b> winners / day</span>
+          <span><b id="statBrands">19</b> gift brands</span>
+          <span><b>00:00</b> ET snapshot</span>
+        </div>
         <div class="hero-cas" id="heroCas"></div>
-        <div class="hero-cta">
-          <button class="btn btn-primary btn-lg" data-action="connect">Check my $GIFT</button>
-          <a class="btn btn-ghost btn-lg" id="xLinkHero" target="_blank" rel="noopener">Follow on X</a>
+        <div class="row">
+          <button class="btn btn-dream" data-action="connect">Enter with wallet</button>
+          <a class="btn btn-glass" href="#midnight">Float to the islands ↓</a>
         </div>
       </div>
+      <div class="scroll-hint" aria-hidden="true"><span></span>scroll to fly</div>
+    </section>
 
-      <div class="countdown-card">
-        <div class="cd-label">Next snapshot in</div>
-        <div class="cd" id="countdown">
-          <div><span id="cdH">--</span><small>hours</small></div>
-          <div><span id="cdM">--</span><small>min</small></div>
-          <div><span id="cdS">--</span><small>sec</small></div>
+    <!-- ============ 1 · MIDNIGHT GIFT (Top 5 daily) ============ -->
+    <section class="isle" id="midnight" data-island="1" data-side="right">
+      <div class="dream-card">
+        <span class="eyebrow">Island I</span>
+        <h2>The Midnight Gift</h2>
+        <p class="sub">Every night at 00:00 New York time the sky takes a snapshot. The five largest $GIFT holders each receive a real gift card code.</p>
+
+        <div class="clock">
+          <div><b id="cdH">--</b><small>hours</small></div><i>:</i>
+          <div><b id="cdM">--</b><small>min</small></div><i>:</i>
+          <div><b id="cdS">--</b><small>sec</small></div>
         </div>
-        <div class="cd-sub">00:00 New York time · <span id="nyNow">--</span> ET now</div>
-        <div class="today-gift">
-          <div class="gift-box" aria-hidden="true"><div class="lid"></div><div class="ribbon"></div></div>
-          <div>
-            <div class="tg-label">Today's reward</div>
-            <div class="tg-name" id="todayGift">—</div>
-            <div class="tg-meta"><span id="winnersCount">5</span> winners · gift card code</div>
-          </div>
+        <p class="clock-sub">until the next snapshot · <span id="nyNow">--</span> ET now</p>
+
+        <div class="today">
+          <div class="mini-gift" aria-hidden="true"><i></i></div>
+          <div><small>Tonight's gift</small><b id="todayGift">—</b><span><span id="winnersCount">5</span> winners · gift card code</span></div>
         </div>
-      </div>
-    </section>
 
-    <!-- STATS STRIP -->
-    <section class="strip">
-      <div><b id="statWinners">5</b><span>winners every day</span></div>
-      <div><b id="statBrands">19</b><span>gift card brands</span></div>
-      <div data-single-html="<b>{short}</b><span>{chain}</span>" data-multi-html="<b>{n}</b><span>Chains</span>"><b>Robinhood</b><span>Chain</span></div>
-      <div><b>00:00</b><span>ET daily snapshot</span></div>
-    </section>
-
-    <!-- HOW IT WORKS -->
-    <section class="section" id="how">
-      <h2>How it works</h2>
-      <p class="section-lead">Three steps. Zero paperwork.</p>
-      <div class="steps">
-        <article class="step">
-          <div class="step-n">01</div>
-          <h3>Get $GIFT</h3>
-          <p data-single="Pick up $GIFT on {chain} and keep it in a self-custody {walletType} wallet." data-multi="Pick up $GIFT on {chains} and keep it in a self-custody wallet.">Pick up $GIFT on Robinhood Chain and keep it in a self-custody EVM wallet.</p>
-        </article>
-        <article class="step">
-          <div class="step-n">02</div>
-          <h3>Hold through midnight</h3>
-          <p>At exactly 00:00 New York time we take a snapshot of every wallet. The five largest holders at that moment are the day's winners.</p>
-        </article>
-        <article class="step">
-          <div class="step-n">03</div>
-          <h3>Unwrap your gift</h3>
-          <p>Winners connect the winning wallet, sign a free message to prove ownership, and reveal their gift card code. Redeem it in minutes.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- CHECK HOLDINGS -->
-    <section class="section" id="check">
-      <div class="check-card">
-        <div>
-          <h2>Your $GIFT</h2>
-          <p class="section-lead" id="walletStatus">Connect a wallet to read your balance directly from the blockchain.</p>
+        <div class="panel" id="check">
+          <div class="panel-head"><h3>Your $GIFT</h3><span class="muted" id="walletStatus">Connect a wallet to read your balance directly from the blockchain.</span></div>
           <div class="wallet-buttons" id="walletButtons">
-            <button class="btn btn-primary hidden" id="btnEvm" data-action="connect-evm">EVM wallet <small id="evmChainsLabel">Robinhood Chain</small></button>
-            <button class="btn btn-primary hidden" id="btnSol" data-action="connect-sol">Solana wallet <small>Phantom · Solflare</small></button>
+            <button class="btn btn-dream btn-sm hidden" id="btnEvm" data-action="connect-evm">EVM wallet <small id="evmChainsLabel">Robinhood Chain</small></button>
+            <button class="btn btn-dream btn-sm hidden" id="btnSol" data-action="connect-sol">Solana wallet <small>Phantom · Solflare</small></button>
           </div>
           <div class="wallet-connected hidden" id="walletConnected">
             <code id="walletAddr"></code>
-            <button class="btn btn-ghost btn-sm" data-action="refresh">Refresh</button>
-            <button class="btn btn-ghost btn-sm" data-action="disconnect">Disconnect</button>
+            <button class="btn btn-glass btn-xs" data-action="refresh">Refresh</button>
+            <button class="btn btn-glass btn-xs" data-action="disconnect">Disconnect</button>
+          </div>
+          <div class="bal-total"><span>Total held</span><b id="balTotal">—</b></div>
+          <ul class="bal-list" id="balList"></ul>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Tonight's Top 5</h3><span class="muted">Final positions lock at 00:00 ET.</span></div>
+          <div class="empty" id="boardEmpty"><b>The leaderboard is still a dream.</b> The live ranking appears here as soon as the snapshot service publishes it.</div>
+          <ol class="board hidden" id="boardList"></ol>
+          <div class="muted tiny hidden" id="boardFoot"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 2 · STAKING ISLE ============ -->
+    <section class="isle" id="staking" data-island="2" data-side="left">
+      <div class="dream-card isle-app" data-app="staking">
+        <span class="eyebrow">Island II</span>
+        <h2>Staking Isle</h2>
+        <p class="sub">Lock $GIFT inside the crystal vault and let rewards accrue while you sleep. Every number below is read live from the staking contract.</p>
+
+        <div class="not-ready hidden" data-el="notReady">
+          <b>This island is still forming.</b>
+          <span>The staking contract hasn't been published yet, so there is nothing to stake and no rewards to show. Nothing here is simulated — it opens the moment the contract goes live.</span>
+        </div>
+
+        <div class="stats">
+          <div><small>Total staked</small><b data-el="total">—</b></div>
+          <div><small>APR (on-chain)</small><b data-el="apr">—</b></div>
+          <div><small>Pool emission</small><b data-el="emission">—</b></div>
+          <div><small>Your staked</small><b data-el="mine">—</b></div>
+          <div class="glow"><small>Rewards accrued</small><b data-el="earned">—</b></div>
+          <div><small>Wallet balance</small><b data-el="wallet">—</b></div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="on" data-tab="stake" role="tab">Stake</button>
+          <button data-tab="unstake" role="tab">Unstake</button>
+        </div>
+        <form class="amount" data-el="form">
+          <label>
+            <input type="text" inputmode="decimal" placeholder="0.0" autocomplete="off" data-el="amount" />
+            <button type="button" class="max" data-el="max">MAX</button>
+          </label>
+          <small class="muted" data-el="hint">Connect a wallet to stake.</small>
+          <button class="btn btn-dream btn-block" type="submit" data-el="submit" disabled>Stake $GIFT</button>
+        </form>
+
+        <div class="row">
+          <button class="btn btn-glass" data-el="claim" disabled>Claim rewards</button>
+          <button class="btn btn-glass hidden" data-el="daily" disabled>Claim daily reward</button>
+          <button class="btn btn-ghost hidden" data-el="exit" disabled>Exit (unstake all + claim)</button>
+        </div>
+        <small class="muted tiny" data-el="dailyNote"></small>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Reward history</h3><button class="link-btn" data-el="historyBtn">Load</button></div>
+          <ul class="history" data-el="history"><li class="muted">Connect a wallet to see your stakes, withdrawals and claimed rewards.</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3 · MYSTERY BOX ISLE ============ -->
+    <section class="isle" id="mystery" data-island="3" data-side="right">
+      <div class="dream-card isle-app" data-app="mystery">
+        <span class="eyebrow">Island III</span>
+        <h2>Mystery Box Isle</h2>
+        <p class="sub">Boxes drift above the island and nobody knows what's inside — not even us. The contract decides each prize when you open it.</p>
+
+        <div class="not-ready hidden" data-el="notReady">
+          <b>The boxes are still sealed by the dream.</b>
+          <span>The Mystery Box contract hasn't been published yet. No prizes are listed until the contract defines them.</span>
+        </div>
+
+        <div class="box-stage" data-el="stage">
+          <div class="mbox" data-el="box"><div class="mbox-lid"></div><div class="mbox-body"></div><div class="mbox-q">?</div></div>
+          <div class="reveal hidden" data-el="reveal"></div>
+        </div>
+
+        <div class="stats three">
+          <div><small>Price per box</small><b data-el="price">—</b></div>
+          <div><small>Boxes opened (you)</small><b data-el="opened">—</b></div>
+          <div><small>Wallet balance</small><b data-el="wallet">—</b></div>
+        </div>
+
+        <div class="qty">
+          <span>Boxes</span>
+          <button type="button" data-el="minus" aria-label="Fewer">−</button>
+          <b data-el="qty">1</b>
+          <button type="button" data-el="plus" aria-label="More">+</button>
+          <small class="muted" data-el="cost"></small>
+        </div>
+        <button class="btn btn-dream btn-block" data-el="open" disabled>Open mystery box</button>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Your openings</h3><button class="link-btn" data-el="historyBtn">Load</button></div>
+          <ul class="history" data-el="history"><li class="muted">Connect a wallet to see what your boxes contained.</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4 · LUCKY DRAW ISLE ============ -->
+    <section class="isle" id="lucky" data-island="4" data-side="left">
+      <div class="dream-card isle-app" data-app="lucky">
+        <span class="eyebrow">Island IV</span>
+        <h2>Lucky Draw Isle</h2>
+        <p class="sub">A wheel turns slowly in the open sky. Each segment and its prize are written in the contract; the spin result comes from the chain, not from this page.</p>
+
+        <div class="not-ready hidden" data-el="notReady">
+          <b>The wheel hasn't touched the sky yet.</b>
+          <span>The Lucky Draw contract hasn't been published, so its segments are unknown and shown as "?".</span>
+        </div>
+
+        <div class="wheel-wrap">
+          <div class="pointer" aria-hidden="true"></div>
+          <svg class="wheel" viewBox="-110 -110 220 220" data-el="wheel" aria-label="Lucky wheel"></svg>
+          <button class="hub" data-el="spin" disabled>SPIN</button>
+        </div>
+        <div class="reveal hidden" data-el="reveal"></div>
+
+        <div class="stats three">
+          <div><small>Cost per spin</small><b data-el="cost">—</b></div>
+          <div><small>Your spins</small><b data-el="spins">—</b></div>
+          <div><small>Wallet balance</small><b data-el="wallet">—</b></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h3>Your spins</h3><button class="link-btn" data-el="historyBtn">Load</button></div>
+          <ul class="history" data-el="history"><li class="muted">Connect a wallet to see your spin results.</li></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 5 · VAULT (brands, chains, rules, FAQ) ============ -->
+    <section class="isle isle-end" id="vault" data-island="5" data-side="center">
+      <div class="dream-card wide">
+        <span class="eyebrow">Island V</span>
+        <h2>The Gift Vault</h2>
+        <p class="sub">Rewards rotate across the world's most-wanted gift cards. Tonight's brand glows.</p>
+        <div class="brands" id="brands"></div>
+        <p class="fine">Brand names belong to their respective owners. Pangea Gift is not affiliated with, sponsored or endorsed by any of these brands; gift cards are purchased through authorized retail channels.</p>
+
+        <h3 class="h3" data-single="{chain}" data-multi="{n} chains">Chains</h3>
+        <div class="chains" id="chainCards"></div>
+
+        <h3 class="h3">Fair play rules</h3>
+        <div class="rules">
+          <div><h4>Snapshot, not average</h4><p>Rankings use the balance held at 00:00:00 ET. What you hold at midnight is what counts.</p></div>
+          <div><h4>One prize per wallet per day</h4><p>Each winning wallet receives one gift card code per daily round.</p></div>
+          <div><h4>Excluded wallets</h4><p>Liquidity pools, bridges, exchange wallets, the team wallet and burn addresses are never ranked.</p></div>
+          <div><h4>Claim window</h4><p>Winners have 7 days to reveal their code with the winning wallet. Unclaimed codes roll into future rounds.</p></div>
+          <div><h4>Anti-gaming</h4><p>Wallets splitting or cycling balances to manipulate rankings may be disqualified.</p></div>
+          <div><h4>Proof, not trust</h4><p>Balances, stakes, box openings and spins are all read from public blockchains. Anyone can verify them on the explorer.</p></div>
+        </div>
+
+        <h3 class="h3" id="faq">Questions from the clouds</h3>
+        <div class="faq">
+          <details><summary>Do I need to stake to win the daily gift card?</summary><p>No. The Midnight Gift only needs $GIFT held in your wallet at 00:00 ET. Staking, Mystery Boxes and the Lucky Draw are optional islands. Note that tokens you stake leave your wallet while they are locked.</p></details>
+          <details><summary data-multi="Which chains is $GIFT on?">Which chain is $GIFT on?</summary><p data-single="{chain} only. Use {walletHint} to hold and check your $GIFT." data-multi="{chains}. Use an EVM wallet (MetaMask, Rabby, Coinbase Wallet…) for EVM chains and Phantom or Solflare for Solana.">Robinhood Chain.</p></details>
+          <details><summary>Where do the APR and rewards come from?</summary><p>Only from the staking contract: total staked, reward rate and your accrued rewards are read on-chain. If the contract doesn't expose enough data to compute APR, the island shows "—" instead of a guess.</p></details>
+          <details><summary>How do I receive my gift card?</summary><p>Connect the winning wallet and sign a free message (no gas, no transaction). Your code is revealed only to you.</p></details>
+          <details><summary>Can I choose the brand?</summary><p>Each day features one brand from the vault. Follow <a id="xLinkFaq" target="_blank" rel="noopener">our X</a> to see upcoming brands.</p></details>
+          <details><summary>Will anyone ever DM me for my seed phrase?</summary><p>Never. Pangea Gift will never ask for your seed phrase or private key. Island transactions are always confirmed by you inside your own wallet.</p></details>
+        </div>
+
+        <div class="end-cta">
+          <p class="end-line">Midnight is coming. Make sure your wallet is in the sky when the clock hits 00:00 ET.</p>
+          <div class="row center">
+            <button class="btn btn-dream" data-action="connect">Connect Wallet</button>
+            <a class="btn btn-glass" id="xLinkCta" target="_blank" rel="noopener">@PangeaGift</a>
           </div>
         </div>
-        <div class="balances" id="balances">
-          <div class="bal-total"><span>Total held</span><b id="balTotal">—</b></div>
-          <ul id="balList"></ul>
-        </div>
-      </div>
-    </section>
 
-    <!-- REWARDS -->
-    <section class="section" id="rewards">
-      <h2>The gift vault</h2>
-      <p class="section-lead">Rewards rotate across 19 of the world's most-wanted gift cards — gaming, shopping, food, streaming and more. Today's brand is highlighted.</p>
-      <div class="brands" id="brands"></div>
-      <p class="fine">Brand names belong to their respective owners. Pangea Gift is not affiliated with, sponsored or endorsed by any of these brands; gift cards are purchased through authorized retail channels.</p>
-    </section>
-
-    <!-- LEADERBOARD -->
-    <section class="section" id="leaderboard">
-      <h2>Today's Top 5</h2>
-      <p class="section-lead" data-single="Live ranking of the largest $GIFT holders on {chain}. Final positions lock at 00:00 ET." data-multi="Live ranking of the largest $GIFT holders on {chains}. Final positions lock at 00:00 ET.">Live ranking of the largest $GIFT holders on Robinhood Chain. Final positions lock at 00:00 ET.</p>
-      <div class="board" id="board">
-        <div class="board-empty" id="boardEmpty">
-          <div class="gift-box small" aria-hidden="true"><div class="lid"></div><div class="ribbon"></div></div>
-          <p><b>Leaderboard opens at launch.</b><br />The live ranking appears here as soon as the $GIFT contract is published and the first snapshot runs.</p>
-        </div>
-        <ol class="board-list hidden" id="boardList"></ol>
-        <div class="board-foot hidden" id="boardFoot"></div>
-      </div>
-    </section>
-
-    <!-- CHAINS -->
-    <section class="section" id="chains">
-      <h2 data-single="{chain}" data-multi="{n} chains">Robinhood Chain</h2>
-      <p class="section-lead" data-single="$GIFT lives on {chain} — one contract, one community, one leaderboard." data-multi="$GIFT lives on {chains} — one token, one community, one leaderboard.">$GIFT lives on Robinhood Chain — one contract, one community, one leaderboard.</p>
-      <div class="chains" id="chainCards"></div>
-    </section>
-
-    <!-- RULES -->
-    <section class="section">
-      <h2>Fair play rules</h2>
-      <div class="rules">
-        <div><h4>Snapshot, not average</h4><p>Rankings use the balance held at 00:00:00 ET. What you hold at midnight is what counts.</p></div>
-        <div><h4>One prize per wallet per day</h4><p>Each winning wallet receives one gift card code per daily round.</p></div>
-        <div><h4>Excluded wallets</h4><p>Liquidity pools, bridges, exchange wallets, the team wallet and burn addresses are never ranked.</p></div>
-        <div><h4>Claim window</h4><p>Winners have 7 days to reveal their code with the winning wallet. Unclaimed codes roll into future rounds.</p></div>
-        <div><h4>Anti-gaming</h4><p>Wallets splitting or cycling balances to manipulate rankings may be disqualified.</p></div>
-        <div><h4>Proof, not trust</h4><p data-single="Balances are read directly from public blockchains. Anyone can verify every winner on the {chain} explorer." data-multi="Balances are read directly from public blockchains. Anyone can verify every winner on the chain explorers.">Balances are read directly from public blockchains. Anyone can verify every winner on the Robinhood Chain explorer.</p></div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="section" id="faq">
-      <h2>FAQ</h2>
-      <div class="faq">
-        <details><summary>Do I need to stake or register?</summary><p>No. Just hold $GIFT in a self-custody wallet. The snapshot finds you automatically.</p></details>
-        <details><summary data-multi="Which chains is $GIFT on?">Which chain is $GIFT on?</summary><p data-single="{chain} only. Use {walletHint} to hold and check your $GIFT." data-multi="{chains}. Use an EVM wallet (MetaMask, Rabby, Coinbase Wallet…) for EVM chains and Phantom or Solflare for Solana.">Robinhood Chain only. Use any EVM wallet (MetaMask, Rabby, Coinbase Wallet…) to hold and check your $GIFT.</p></details>
-        <details><summary>When exactly is the snapshot?</summary><p>Every day at 00:00 New York time (ET), including weekends. The countdown on this page always shows the time left.</p></details>
-        <details><summary>How do I receive my gift card?</summary><p>Connect the winning wallet on this site and sign a free message (no gas, no transaction). Your code is revealed only to you.</p></details>
-        <details><summary>Can I choose the brand?</summary><p>Each day features one brand from the vault. Follow <a id="xLinkFaq" target="_blank" rel="noopener">our X</a> to see upcoming brands.</p></details>
-        <details><summary>Will anyone ever DM me for my seed phrase?</summary><p>Never. Pangea Gift will never ask for your seed phrase, private key or a token approval to claim a prize. Signing a plain message is all it takes.</p></details>
-      </div>
-    </section>
-
-    <section class="cta">
-      <h2>Midnight is coming.</h2>
-      <p>Make sure your wallet is on the board when the clock hits 00:00 ET.</p>
-      <div class="hero-cta center">
-        <button class="btn btn-primary btn-lg" data-action="connect">Connect Wallet</button>
-        <a class="btn btn-ghost btn-lg" id="xLinkCta" target="_blank" rel="noopener">@PangeaGift</a>
+        <footer class="footer">
+          <p>$GIFT is a community token with no intrinsic value or expectation of financial return. Rewards are promotional and may change. Not financial advice. Always DYOR.</p>
+          <p>© <span id="year"></span> Pangea Gift · <a id="xLinkFoot" target="_blank" rel="noopener">X</a> · <a id="xLinkHero" target="_blank" rel="noopener">Follow</a></p>
+        </footer>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="brand"><img src="assets/logo.svg" alt="" width="28" height="28" /><span>Pangea<b>Gift</b></span></div>
-    <p>$GIFT is a community token with no intrinsic value or expectation of financial return. Rewards are promotional and may change. Not financial advice. Always DYOR.</p>
-    <p>© <span id="year"></span> Pangea Gift · <a id="xLinkFoot" target="_blank" rel="noopener">X</a></p>
-  </footer>
-
   <!-- Wallet picker -->
   <div class="modal hidden" id="walletModal">
     <div class="modal-card">
-      <div class="modal-head"><h3>Connect a wallet</h3><button class="x" data-action="close-modal" aria-label="Close">×</button></div>
+      <div class="modal-head"><h3>Choose your wallet</h3><button class="x" data-action="close-modal" aria-label="Close">×</button></div>
       <div id="walletOptions"></div>
-      <p class="fine">Read-only: connecting only shares your public address. No approvals, no transactions.</p>
+      <p class="fine">Connecting only shares your public address. Every island action is a transaction you confirm in your own wallet.</p>
     </div>
   </div>
   <div class="toast hidden" id="toast"></div>
 
   <script src="js/config.js"></script>
-  <script src="js/app.js"></script>
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/world.js"></script>
 </body>
 </html>

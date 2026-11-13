@@ -1,4 +1,17 @@
-# Pangea Gift ($GIFT) — pangeagift.xyz
+# Gift Dream World — Pangea Gift ($GIFT) · pangeagift.xyz
+
+Surreal / dreamcore 3D site (Three.js, vendored in `js/vendor/`): floating islands, clouds, gifts, stairs and portals. The camera flies island → island as you scroll.
+
+| Island | Section | Data source |
+|---|---|---|
+| Gate | `#gate` | config (CA, chains) |
+| I · Midnight Gift | `#midnight` | countdown, wallet balances (RPC), `leaderboardUrl` |
+| II · Staking Isle | `#staking` | `staking.address` contract |
+| III · Mystery Box Isle | `#mystery` | `mysteryBox.address` contract |
+| IV · Lucky Draw Isle | `#lucky` | `luckyDraw.address` contract |
+| V · Vault | `#vault` | config (brands, rules, FAQ) |
+
+An island with an empty contract address shows a "not published yet" state — no fake APR, rewards, prizes or history.
 
 Static frontend (single chain or multi-chain): Top 5 $GIFT holders win a gift card every day; snapshot at 00:00 New York time.
 
@@ -17,3 +30,24 @@ All settings live in `js/config.js`:
 
 ## Deploy on Vercel
 Framework Preset: **Other** · Build Command: empty · Output Directory: `.`
+
+## Island contracts (set addresses in `js/config.js`)
+Each island: `chain` (EVM chain key), `address`, optional `fromBlock` (deploy block, speeds up history), `historyBlocks`, `logChunk`.
+Optional functions are auto-detected from the bytecode (also behind EIP-1967 proxies).
+
+**Staking** (Synthetix StakingRewards-style)
+- required: `totalSupply()`, `balanceOf(address)`, `earned(address)`, `stake(uint256)`, `withdraw(uint256)`, `getReward()`
+- optional: `stakingToken()`, `rewardsToken()`, `rewardRate()`, `periodFinish()`, `exit()`, `claimDaily()`, `nextClaimTime(address)`
+- events: `Staked(address indexed user,uint256)`, `Withdrawn(address indexed user,uint256)`, `RewardPaid(address indexed user,uint256)`, `DailyClaimed(address indexed user,uint256)`
+- APR is shown only when reward token = staking token and the reward period is live: `rewardRate × 31,536,000 / totalSupply`.
+
+**Mystery Box**
+- `boxPrice()`, `openBox(uint256 count)`; optional `paymentToken()`, `maxPerTx()`, `prizeName(uint256)`
+- event `BoxOpened(address indexed user, uint256 indexed boxId, uint256 prizeId, uint256 amount)`
+
+**Lucky Draw**
+- `spinCost()`, `segmentCount()`, `segmentReward(uint256)`, `spin()`; optional `paymentToken()`
+- event `SpinResult(address indexed user, uint256 indexed spinId, uint256 segment, uint256 reward)`
+
+Payment is in $GIFT (`paymentToken()` or `contracts.evm`); the site asks for an exact-amount approval first.
+Results are read from the tx receipt; VRF-style contracts that settle later are polled for ~90 s.
