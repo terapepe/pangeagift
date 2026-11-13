@@ -9,11 +9,11 @@
   <meta property="og:description" content="A dream sky of floating islands. Top 5 holders win a gift card every day." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="theme-color" content="#e9dcff" />
-  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+  <link rel="icon" href="/assets/logo.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
   <canvas id="dream" aria-hidden="true"></canvas>
@@ -26,48 +26,38 @@
 
   <!-- ============ HEADER ============ -->
   <header class="nav">
-    <a class="brand" href="#gate"><img src="assets/logo.svg" alt="" width="34" height="34" /><span>Pangea<em>Gift</em></span></a>
+    <a class="brand" href="/" data-link><img src="/assets/logo.svg" alt="" width="34" height="34" /><span>Pangea<em>Gift</em></span></a>
     <nav class="isles" aria-label="Islands">
-      <a href="#gate" data-nav="0"><i></i><span>Gate</span></a>
-      <a href="#midnight" data-nav="1"><i></i><span>Midnight Gift</span></a>
-      <a href="#staking" data-nav="2"><i></i><span>Staking</span></a>
-      <a href="#mystery" data-nav="3"><i></i><span>Mystery Box</span></a>
-      <a href="#lucky" data-nav="4"><i></i><span>Lucky Draw</span></a>
-      <a href="#vault" data-nav="5"><i></i><span>Vault</span></a>
+      <a href="/" data-link data-nav="midnight"><i></i><span>Midnight Gift</span></a>
+      <a href="/staking" data-link data-nav="staking"><i></i><span>Staking</span></a>
+      <a href="/mystery-box" data-link data-nav="mystery"><i></i><span>Mystery Box</span></a>
+      <a href="/lucky-draw" data-link data-nav="lucky"><i></i><span>Lucky Draw</span></a>
+      <a href="/vault" data-link data-nav="vault"><i></i><span>Vault</span></a>
     </nav>
     <button class="wallet-chip" data-action="connect" id="navConnect">
       <span class="wc-dot"></span><span class="wc-text" id="navWalletText">Connect Wallet</span><b class="wc-bal hidden" id="navBal"></b>
     </button>
   </header>
 
+  <!-- Contract address — always visible, full length -->
+  <div class="ca-bar" id="caBar" aria-label="Contract address"></div>
+
+  <!-- page transition: clouds sweep across while the camera flies -->
+  <div class="warp" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
   <main>
-    <!-- ============ 0 · GATE ============ -->
-    <section class="isle isle-hero" id="gate" data-island="0" data-side="left">
-      <div class="dream-card hero-card">
-        <span class="eyebrow" data-single="Pangea Gift · {chain}" data-multi="Pangea Gift · {n} chains">Pangea Gift</span>
-        <h1>Gift<br /><span class="shimmer">Dream</span> World</h1>
-        <p class="lead">Somewhere above the clouds, gifts float free. Hold <b>$GIFT</b>, climb the staircase into the sky, and wander from island to island — each one a different way to unwrap something.</p>
+    <!-- ============ 1 · MIDNIGHT GIFT (Top 5 daily) ============ -->
+    <section class="isle page" id="midnight" data-title="Midnight Gift" data-island="1" data-side="right">
+      <div class="dream-card">
+        <span class="eyebrow">Gift Dream World · Island I</span>
+        <h2>The Midnight Gift</h2>
+        <p class="sub">Every night at 00:00 New York time the sky takes a snapshot. The five largest $GIFT holders each receive a real gift card code.</p>
         <p class="chain-tagline hidden" id="chainTagline"></p>
         <div class="hero-chips">
           <span><b id="statWinners">5</b> winners / day</span>
           <span><b id="statBrands">19</b> gift brands</span>
-          <span><b>00:00</b> ET snapshot</span>
+          <span data-single="{chain}" data-multi="{n} chains">chains</span>
         </div>
-        <div class="hero-cas" id="heroCas"></div>
-        <div class="row">
-          <button class="btn btn-dream" data-action="connect">Enter with wallet</button>
-          <a class="btn btn-glass" href="#midnight">Float to the islands ↓</a>
-        </div>
-      </div>
-      <div class="scroll-hint" aria-hidden="true"><span></span>scroll to fly</div>
-    </section>
-
-    <!-- ============ 1 · MIDNIGHT GIFT (Top 5 daily) ============ -->
-    <section class="isle" id="midnight" data-island="1" data-side="right">
-      <div class="dream-card">
-        <span class="eyebrow">Island I</span>
-        <h2>The Midnight Gift</h2>
-        <p class="sub">Every night at 00:00 New York time the sky takes a snapshot. The five largest $GIFT holders each receive a real gift card code.</p>
 
         <div class="clock">
           <div><b id="cdH">--</b><small>hours</small></div><i>:</i>
@@ -106,7 +96,7 @@
     </section>
 
     <!-- ============ 2 · STAKING ISLE ============ -->
-    <section class="isle" id="staking" data-island="2" data-side="left">
+    <section class="isle page" id="staking" data-title="Staking Isle" data-island="2" data-side="left">
       <div class="dream-card isle-app" data-app="staking">
         <span class="eyebrow">Island II</span>
         <h2>Staking Isle</h2>
@@ -154,7 +144,7 @@
     </section>
 
     <!-- ============ 3 · MYSTERY BOX ISLE ============ -->
-    <section class="isle" id="mystery" data-island="3" data-side="right">
+    <section class="isle page" id="mystery" data-title="Mystery Box Isle" data-island="3" data-side="right">
       <div class="dream-card isle-app" data-app="mystery">
         <span class="eyebrow">Island III</span>
         <h2>Mystery Box Isle</h2>
@@ -193,7 +183,7 @@
     </section>
 
     <!-- ============ 4 · LUCKY DRAW ISLE ============ -->
-    <section class="isle" id="lucky" data-island="4" data-side="left">
+    <section class="isle page" id="lucky" data-title="Lucky Draw Isle" data-island="4" data-side="left">
       <div class="dream-card isle-app" data-app="lucky">
         <span class="eyebrow">Island IV</span>
         <h2>Lucky Draw Isle</h2>
@@ -225,7 +215,7 @@
     </section>
 
     <!-- ============ 5 · VAULT (brands, chains, rules, FAQ) ============ -->
-    <section class="isle isle-end" id="vault" data-island="5" data-side="center">
+    <section class="isle isle-end page" id="vault" data-title="Gift Vault" data-island="5" data-side="center">
       <div class="dream-card wide">
         <span class="eyebrow">Island V</span>
         <h2>The Gift Vault</h2>
@@ -282,8 +272,8 @@
   </div>
   <div class="toast hidden" id="toast"></div>
 
-  <script src="js/config.js"></script>
-  <script type="module" src="js/app.js"></script>
-  <script type="module" src="js/world.js"></script>
+  <script src="/js/config.js"></script>
+  <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/world.js"></script>
 </body>
 </html>

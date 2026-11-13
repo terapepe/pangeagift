@@ -69,13 +69,15 @@ function renderStatic() {
   $("winnersCount").textContent = $("statWinners").textContent = C.rewards.winnersPerDay;
   $("statBrands").textContent = C.rewards.brands.length;
 
-  $("heroCas").innerHTML = CA_GROUPS.map(({ ca, keys }) => {
+  // full CA, always visible (one block per distinct address)
+  $("caBar").innerHTML = CA_GROUPS.map(({ ca, keys }) => {
     const tag = keys.map((k) => C.chains[k].short || C.chains[k].label).join(" · ");
-    const links = ca ? keys.map((k) => `<a href="${C.chains[k].explorer}${ca}" target="_blank" rel="noopener">${C.chains[k].short} ↗</a>`).join("") : "";
+    const links = ca ? keys.map((k) => `<a href="${C.chains[k].explorer}${ca}" target="_blank" rel="noopener" title="${C.chains[k].label} explorer">${C.chains[k].short} ↗</a>`).join("") : "";
     return `<div class="ca${ca ? "" : " off"}" ${ca ? `data-copy="${ca}" title="Click to copy"` : ""}>
-      <span class="ca-tag">${tag}</span><code>${ca ? short(ca) : "coming soon"}</code>
-      ${ca ? `<span class="ca-copy" data-text="Copy">Copy</span>` : ""}<span class="ca-links">${links}</span></div>`;
+      <span class="ca-tag">CA · ${tag}</span><code class="ca-addr">${ca || "Contract coming soon"}</code>
+      ${ca ? `<button class="ca-copy" type="button" data-text="Copy">Copy</button>` : ""}<span class="ca-links">${links}</span></div>`;
   }).join("");
+  new ResizeObserver(() => document.documentElement.style.setProperty("--ca-h", $("caBar").offsetHeight + "px")).observe($("caBar"));
 
   $("brands").innerHTML = C.rewards.brands.map((b) => {
     const on = b === C.rewards.current;
@@ -733,7 +735,7 @@ function disconnect() {
 // ================= events =================
 document.addEventListener("click", (e) => {
   const a = e.target.closest("[data-action]")?.dataset.action;
-  if (a === "connect") state.address ? $("midnight").scrollIntoView({ behavior: "smooth" }) : openModal();
+  if (a === "connect") state.address ? go("/") : openModal();
   else if (a === "connect-evm" || a === "connect-sol") openModal();
   else if (a === "close-modal") closeModal();
   else if (a === "refresh") { loadBalances(); ISLANDS.forEach((i) => i.onWallet()); }
@@ -747,15 +749,49 @@ document.addEventListener("click", (e) => {
 });
 $("walletModal").addEventListener("click", (e) => e.target.id === "walletModal" && closeModal());
 
-// active island in the nav + reveal cards
+// ================= router: one page per island, camera flight + cloud sweep =================
+const ROUTES = { "/": "midnight", "/staking": "staking", "/mystery-box": "mystery", "/lucky-draw": "lucky", "/vault": "vault" };
 const navLinks = [...document.querySelectorAll("[data-nav]")];
-const io = new IntersectionObserver((entries) => entries.forEach((en) => {
-  if (!en.isIntersecting) return;
-  en.target.classList.add("seen");
-  const i = en.target.dataset.island;
-  navLinks.forEach((l) => l.classList.toggle("on", l.dataset.nav === i));
-}), { threshold: 0.35 });
-document.querySelectorAll("[data-island]").forEach((s) => io.observe(s));
+const norm = (p) => (p.replace(/\/index\.html$/, "/").replace(/\/+$/, "") || "/");
+let curPage = null, navToken = 0;
+function show(path, instant) {
+  const id = ROUTES[norm(path)] || "midnight";
+  const next = $(id);
+  if (next === curPage) return;
+  const prev = curPage, token = ++navToken;
+  curPage = next;
+  navLinks.forEach((l) => l.classList.toggle("on", l.dataset.nav === id));
+  document.title = next.dataset.title + " — Gift Dream World · Pangea Gift ($GIFT)";
+  document.body.dataset.page = id;
+  document.body.dataset.island = next.dataset.island;
+  document.body.dataset.side = next.dataset.side;
+  dispatchEvent(new CustomEvent("dream:goto", { detail: { island: +next.dataset.island, side: next.dataset.side, instant } }));
+  const enter = () => {
+    if (token !== navToken) return;
+    document.querySelectorAll(".page").forEach((p) => p.classList.remove("active", "leave", "enter"));
+    scrollTo(0, 0);
+    next.classList.add("active", "enter");
+  };
+  if (instant || !prev) return enter();
+  document.body.classList.remove("warping"); void document.body.offsetWidth;
+  document.body.classList.add("warping");
+  setTimeout(() => token === navToken && document.body.classList.remove("warping"), 1600);
+  prev.classList.add("leave");
+  setTimeout(enter, 520);
+}
+function go(path) {
+  if (norm(path) !== norm(location.pathname)) history.pushState(null, "", path);
+  show(path);
+}
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[data-link]");
+  if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+  e.preventDefault();
+  go(a.getAttribute("href"));
+});
+addEventListener("popstate", () => show(location.pathname));
+if (!ROUTES[norm(location.pathname)]) history.replaceState(null, "", "/");
+show(location.pathname, true);
 
 // loader: hide when the 3D world draws its first frame (or after a short wait)
 const hideLoader = () => $("loader").classList.add("gone");

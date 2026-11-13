@@ -429,17 +429,8 @@ const sparkleMats = [];
   scene.add(new THREE.Points(tg, tm));
 }
 
-// ---------- scroll-driven camera flight ----------
-const sections = [...document.querySelectorAll("[data-island]")];
-let anchors = [];
-function measure() {
-  const vh = innerHeight;
-  anchors = sections.map((s) => ({
-    y: s.offsetTop + s.offsetHeight / 2 - vh / 2,
-    i: +s.dataset.island,
-    side: s.dataset.side || "left",
-  }));
-}
+// ---------- route-driven camera flight (each page = one island) ----------
+let here = { i: +(document.body.dataset.island || 1), side: document.body.dataset.side || "right" };
 function waypoint(a) {
   const d = ISLANDS[a.i];
   const mob = small();
@@ -449,26 +440,33 @@ function waypoint(a) {
     look: d.p.clone().add(new THREE.Vector3(shift, mob ? -5 : 2.5, 0)),
   };
 }
-const camPos = new THREE.Vector3(0, 8, 34), camLook = new THREE.Vector3();
-const goalPos = new THREE.Vector3(), goalLook = new THREE.Vector3();
+const camPos = new THREE.Vector3(), camLook = new THREE.Vector3();
+const fromPos = new THREE.Vector3(), fromLook = new THREE.Vector3();
+let goal = waypoint(here), flight = null; // {t0, dur, swing}
 const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-const ease = (f) => f * f * (3 - 2 * f);
-function computeGoal() {
-  if (!anchors.length) return;
-  const s = scrollY;
-  let k = 0;
-  while (k < anchors.length - 1 && s >= anchors[k + 1].y) k++;
-  const A = waypoint(anchors[k]);
-  if (k >= anchors.length - 1 || s <= anchors[0].y) {
-    goalPos.copy(A.pos); goalLook.copy(A.look); return;
-  }
-  const B = waypoint(anchors[k + 1]);
-  const f = ease(Math.min(1, Math.max(0, (s - anchors[k].y) / (anchors[k + 1].y - anchors[k].y))));
-  goalPos.lerpVectors(A.pos, B.pos, f);
-  goalPos.y += Math.sin(f * Math.PI) * 9; // swoop up between islands
-  goalPos.x += Math.sin(f * Math.PI) * (anchors[k].side === "left" ? 8 : -8);
-  goalLook.lerpVectors(A.look, B.look, f);
+const ease = (f) => (f < 0.5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2);
+const baseFov = () => (small() ? 62 : 48);
+function flyTo(i, side, instant) {
+  const prev = here;
+  here = { i, side };
+  goal = waypoint(here);
+  if (instant || reduce) { flight = null; camPos.copy(goal.pos); camLook.copy(goal.look); return; }
+  fromPos.copy(camPos); fromLook.copy(camLook);
+  const dist = fromPos.distanceTo(goal.pos);
+  flight = { t0: performance.now(), dur: Math.min(2600, 1300 + dist * 9), swing: (i > prev.i ? 1 : -1) * Math.min(26, dist * 0.18) };
 }
+function updateCamera(now) {
+  if (!flight) { camPos.lerp(goal.pos, 0.08); camLook.lerp(goal.look, 0.08); camera.fov += (baseFov() - camera.fov) * 0.1; return; }
+  const raw = Math.min(1, (now - flight.t0) / flight.dur), f = ease(raw), arc = Math.sin(raw * Math.PI);
+  camPos.lerpVectors(fromPos, goal.pos, f);
+  camPos.y += arc * 16;                 // rise above the clouds between islands
+  camPos.x += arc * flight.swing;       // bank sideways
+  camPos.z += arc * 18;                 // pull back for the overview
+  camLook.lerpVectors(fromLook, goal.look, f);
+  camera.fov = baseFov() + arc * 10;    // warp feel
+  if (raw >= 1) flight = null;
+}
+addEventListener("dream:goto", (e) => flyTo(e.detail.island, e.detail.side, e.detail.instant));
 
 addEventListener("pointermove", (e) => {
   mouse.tx = (e.clientX / innerWidth - 0.5) * 2;
@@ -476,12 +474,9 @@ addEventListener("pointermove", (e) => {
 }, { passive: true });
 addEventListener("resize", () => {
   camera.aspect = innerWidth / innerHeight;
-  camera.fov = small() ? 62 : 48;
-  camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
-  measure();
+  goal = waypoint(here);
 });
-new ResizeObserver(measure).observe(document.body);
 
 // ---------- events from the dApp (visual feedback only) ----------
 addEventListener("dream:spin", () => (wheelBoost = 1.6));
@@ -491,19 +486,16 @@ addEventListener("dream:box", () => mysteryBoxes.forEach((b, i) => setTimeout(()
 const clock = new THREE.Clock();
 let running = true, first = true;
 document.addEventListener("visibilitychange", () => { running = !document.hidden; if (running) { clock.getDelta(); loop(); } });
-measure();
-computeGoal();
-camPos.copy(goalPos); camLook.copy(goalLook);
+camPos.copy(goal.pos); camLook.copy(goal.look);
+camera.fov = baseFov();
 
 function loop() {
   if (!running) return;
   requestAnimationFrame(loop);
   const dt = Math.min(clock.getDelta(), 0.05);
   const t = clock.elapsedTime;
-  computeGoal();
-  const k = reduce ? 1 : 1 - Math.pow(0.0025, dt);
-  camPos.lerp(goalPos, k);
-  camLook.lerp(goalLook, k);
+  updateCamera(performance.now());
+  camera.updateProjectionMatrix();
   mouse.x += (mouse.tx - mouse.x) * 0.04;
   mouse.y += (mouse.ty - mouse.y) * 0.04;
   camera.position.set(camPos.x + mouse.x * 2.2, camPos.y - mouse.y * 1.4, camPos.z);

@@ -2,14 +2,15 @@
 
 Surreal / dreamcore 3D site (Three.js, vendored in `js/vendor/`): floating islands, clouds, gifts, stairs and portals. The camera flies island → island as you scroll.
 
-| Island | Section | Data source |
+Each island is its own page (History API routes, `vercel.json` rewrites to `index.html`). Switching pages flies the camera to that island with a cloud-sweep transition. The full contract address bar stays visible on every page.
+
+| Page | URL | Data source |
 |---|---|---|
-| Gate | `#gate` | config (CA, chains) |
-| I · Midnight Gift | `#midnight` | countdown, wallet balances (RPC), `leaderboardUrl` |
-| II · Staking Isle | `#staking` | `staking.address` contract |
-| III · Mystery Box Isle | `#mystery` | `mysteryBox.address` contract |
-| IV · Lucky Draw Isle | `#lucky` | `luckyDraw.address` contract |
-| V · Vault | `#vault` | config (brands, rules, FAQ) |
+| I · Midnight Gift | `/` | countdown, wallet balances (RPC), `leaderboardUrl` |
+| II · Staking Isle | `/staking` | `staking.address` contract |
+| III · Mystery Box Isle | `/mystery-box` | `mysteryBox.address` contract |
+| IV · Lucky Draw Isle | `/lucky-draw` | `luckyDraw.address` contract |
+| V · Vault | `/vault` | config (brands, chains, rules, FAQ) |
 
 An island with an empty contract address shows a "not published yet" state — no fake APR, rewards, prizes or history.
 
