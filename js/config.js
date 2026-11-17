@@ -1,6 +1,6 @@
 window.PANGEA_CONFIG = {
   // Site : "single" · "multi"
-  mode: "multi",
+  mode: "single",
   singleChain: "robinhood", // robinhood | solana | base | bsc
   multiOrder: ["solana", "robinhood", "base", "bsc"],
 
@@ -14,8 +14,8 @@ window.PANGEA_CONFIG = {
   },
 
   contracts: {
-    evm: "0x3a0EDDC21AbFf1C735A1e2472c04eDc9ec9ba6EA",
-    sol: "HrHnPSkHzqB4czjvdd3csyvrprzWtEnqJRvtL9wTT6ea",
+    evm: "",
+    sol: "",
   },
 
   chains: {
