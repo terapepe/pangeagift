@@ -13,7 +13,7 @@ window.PANGEA_CONFIG = {
   },
 
   contracts: {
-    evm: "0x0d5Cb83F067565c5c104d6CaEf6B865DFc7c76Ea",
+    evm: "",
     sol: "",
   },
 
