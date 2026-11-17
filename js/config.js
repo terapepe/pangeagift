@@ -1,5 +1,4 @@
 window.PANGEA_CONFIG = {
-  // Site : "single" · "multi"
   mode: "single",
   singleChain: "robinhood", // robinhood | solana | base | bsc
   multiOrder: ["solana", "robinhood", "base", "bsc"],
@@ -10,11 +9,11 @@ window.PANGEA_CONFIG = {
   },
 
   socials: {
-    x: "https://x.com/dropperdeals/", // X handle ("PangeaGift") hoặc link X đầy đủ (profile/post)
+    x: "https://x.com/dropperdeals/", 
   },
 
   contracts: {
-    evm: "",
+    evm: "0x0d5Cb83F067565c5c104d6CaEf6B865DFc7c76Ea",
     sol: "",
   },
 
@@ -37,13 +36,6 @@ window.PANGEA_CONFIG = {
     ],
   },
 
-  // leaderboardUrl: "", // JSON endpoint for the Top 5 (backend, later)
-
-  // ================= DREAM ISLANDS (smart contracts) =================
-  // Empty address = island shows "contract not deployed" (no fake numbers).
-  // All values (APR, rewards, prizes, history) are read on-chain only.
-
-  // Staking Isle — StakingRewards-style contract (see README for the interface)
   staking: {
     chain: "robinhood",         // EVM chain key from `chains`
     address: "",                // staking contract address
@@ -51,7 +43,6 @@ window.PANGEA_CONFIG = {
     logChunk: 50000,            // eth_getLogs block range per request
   },
 
-  // Mystery Box Isle — openBox(uint256 count), price paid in $GIFT
   mysteryBox: {
     chain: "robinhood",
     address: "",
